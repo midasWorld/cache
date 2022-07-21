@@ -4,12 +4,14 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.midas.cache.domain.User;
 import com.midas.cache.domain.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -23,6 +25,7 @@ public class UserService {
 	}
 
 	@CachePut(value = "users", key = "#id")
+	@Transactional
 	public User changePassword(Long id, String password) {
 		User user = userRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("Could not found User with id=" + id));
@@ -31,6 +34,7 @@ public class UserService {
 	}
 
 	@CacheEvict(value = "users", key = "#id")
+	@Transactional
 	public void delete(Long id) {
 		User user = userRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("Could not found User with id=" + id));
